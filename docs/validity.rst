@@ -30,12 +30,17 @@ Manually, such parameters can be obtained the following way:
 
     import pandas as pd
     import numpy as np
+
     # Retrieve the driving cycle WLTC 3 from the UNECE
-    driving_cycle = pd.read_excel('http://www.unece.org/fileadmin/DAM/trans/doc/2012/wp29grpe/WLTP-DHC-12-07e.xls',
-                sheet_name='WLTC_class_3', skiprows=6, usecols=[2,4,5])
+    driving_cycle = pd.read_excel(
+        "http://www.unece.org/fileadmin/DAM/trans/doc/2012/wp29grpe/WLTP-DHC-12-07e.xls",
+        sheet_name="WLTC_class_3",
+        skiprows=6,
+        usecols=[2, 4, 5],
+    )
 
     # Calculate velocity (km/h -> m/s)
-    velocity = driving_cycle['km/h'].values * 1000 / 3600
+    velocity = driving_cycle["km/h"].values * 1000 / 3600
 
     # Retrieve driving distance (-> km)
     driving_distance = velocity.sum() * 1000
@@ -45,14 +50,15 @@ Manually, such parameters can be obtained the following way:
 
     # Retrieve acceleration by calculating the delta of velocity per time interval of 2 seconds
     acceleration = np.zeros_like(velocity)
-    acceleration[1:-1] = (velocity[2:] - velocity[:-2])/2
+    acceleration[1:-1] = (velocity[2:] - velocity[:-2]) / 2
 
 Using ``carculator``, these parameters can be obtained the following way:
 
 .. code-block:: python
 
     from carculator.energy_consumption import EnergyConsumptionModel
-    ecm = EnergyConsumptionModel('WLTC')
+
+    ecm = EnergyConsumptionModel("WLTC")
 
     # Access the driving distance
     ecm.velocity.sum() * 1000
@@ -68,7 +74,7 @@ Both approaches should return identical results:
 .. code-block:: python
 
     print(np.array_equal(velocity, ecm.velocity))
-    print(driving_distance == ecm.velocity.sum()*1000)
+    print(driving_distance == ecm.velocity.sum() * 1000)
     print(driving_time == len(ecm.velocity))
     print(np.array_equal(acceleration, ecm.acceleration))
 
@@ -81,7 +87,9 @@ And the acceleration returned by ``carculator`` should equal the values given by
 
 .. code-block:: python
 
-    np.array_equal(np.around(ecm.acceleration,4),np.around(driving_cycle['m/s²'].values,4))
+    np.array_equal(
+        np.around(ecm.acceleration, 4), np.around(driving_cycle["m/s²"].values, 4)
+    )
 
     True
 
@@ -89,13 +97,13 @@ Which can be also be verified visually:
 
 .. code-block:: python
 
-    plt.plot(driving_cycle['m/s²'].values, label='UNECE')
-    plt.plot(acceleration, label='Manually calculated')
-    plt.plot(ecm.acceleration, label='carculator', alpha=0.6)
+    plt.plot(driving_cycle["m/s²"].values, label="UNECE")
+    plt.plot(acceleration, label="Manually calculated")
+    plt.plot(ecm.acceleration, label="carculator", alpha=0.6)
     plt.legend()
-    plt.ylabel('m/s2')
-    plt.xlabel('second')
-    plt.savefig('comparison_driving_cycle.png')
+    plt.ylabel("m/s2")
+    plt.xlabel("second")
+    plt.savefig("comparison_driving_cycle.png")
     plt.show()
 
 .. image:: /_static/img/comparison_driving_cycle.png
@@ -118,31 +126,56 @@ Parameters such as total cargo mass, curb mass and driving mass, can be obtained
 
 .. code-block:: python
 
-    cm.array.sel(size='SUV', powertrain='BEV', year=2020, parameter=['cargo mass','curb mass', 'driving mass']).values
+    cm.array.sel(
+        size="SUV",
+        powertrain="BEV",
+        year=2020,
+        parameter=["cargo mass", "curb mass", "driving mass"],
+    ).values
 
-    array([[  20.        ],
-       [1719.56033224],
-       [1874.56033224]])
+    array([[20.0], [1719.56033224], [1874.56033224]])
 
 One can check whether `total cargo mass` is indeed equal to cargo mass plus the product of the number of passengers
 and the average passenger weight:
 
 .. code-block:: python
 
-    total_cargo, cargo, passengers, passengers_weight = cm.array.sel(size='SUV', powertrain='BEV', year=2020,
-        parameter=['total cargo mass','cargo mass','average passengers', 'average passenger mass']).values
-    print('Total cargo of {} kg, with a cargo mass of {} kg, and {} passengers of individual weight of {} kg.'.format(total_cargo[0], cargo[0], passengers[0], passengers_weight[0]))
-    print(total_cargo == cargo+(passengers * passengers_weight))
+    total_cargo, cargo, passengers, passengers_weight = cm.array.sel(
+        size="SUV",
+        powertrain="BEV",
+        year=2020,
+        parameter=[
+            "total cargo mass",
+            "cargo mass",
+            "average passengers",
+            "average passenger mass",
+        ],
+    ).values
+    print(
+        "Total cargo of {} kg, with a cargo mass of {} kg, and {} passengers of individual weight of {} kg.".format(
+            total_cargo[0], cargo[0], passengers[0], passengers_weight[0]
+        )
+    )
+    print(total_cargo == cargo + (passengers * passengers_weight))
 
-    Total cargo of 155.0 kg, with a cargo mass of 20.0 kg, and 1.8 passengers of individual weight of 75.0 kg.
+    "Total cargo of 155.0 kg, with a cargo mass of 20.0 kg, and 1.8 passengers of individual weight of 75.0 kg."
     [True]
 
 However, most of the driving mass is explained by the curb mass:
 
 .. code-block:: python
 
-    plt.pie(np.squeeze(cm.array.sel(size='SUV', powertrain='BEV', year=2020,
-        parameter=['total cargo mass', 'curb mass']).values).tolist(), labels=['Total cargo mass', 'Curb mass'])
+    plt.pie(
+        np.squeeze(
+            cm.array.sel(
+                size="SUV",
+                powertrain="BEV",
+                year=2020,
+                parameter=["total cargo mass", "curb mass"],
+            ).values
+        ).tolist(),
+        labels=["Total cargo mass", "Curb mass"],
+    )
     plt.show()
 
 .. image:: /_static/img/pie_total_mass.png
@@ -156,54 +189,84 @@ On an equivalent diesel powertrain, the mass of the glider base is comparatively
 
 .. code-block:: python
 
-    l_param=["fuel mass","charger mass","converter mass","glider base mass","inverter mass","power distribution unit mass",
-            "combustion engine mass","electric engine mass","powertrain mass","fuel cell stack mass",
-            "fuel cell ancillary BoP mass","fuel cell essential BoP mass","battery cell mass","battery BoP mass","fuel tank mass"]
+    l_param = [
+        "fuel mass",
+        "charger mass",
+        "converter mass",
+        "glider base mass",
+        "inverter mass",
+        "power distribution unit mass",
+        "combustion engine mass",
+        "electric engine mass",
+        "powertrain mass",
+        "fuel cell stack mass",
+        "fuel cell ancillary BoP mass",
+        "fuel cell essential BoP mass",
+        "battery cell mass",
+        "battery BoP mass",
+        "fuel tank mass",
+    ]
 
 
-    colors = ['yellowgreen','red','gold','lightskyblue','white','lightcoral','blue','pink', 'darkgreen','yellow','grey','violet','magenta','cyan', 'green']
+    colors = [
+        "yellowgreen",
+        "red",
+        "gold",
+        "lightskyblue",
+        "white",
+        "lightcoral",
+        "blue",
+        "pink",
+        "darkgreen",
+        "yellow",
+        "grey",
+        "violet",
+        "magenta",
+        "cyan",
+        "green",
+    ]
 
-    BEV_mass = np.squeeze(cm.array.sel(size='SUV', powertrain='BEV', year=2020,
-            parameter=l_param).values)
+    BEV_mass = np.squeeze(
+        cm.array.sel(size="SUV", powertrain="BEV", year=2020, parameter=l_param).values
+    )
 
-    percent = 100.*BEV_mass/BEV_mass.sum()
+    percent = 100.0 * BEV_mass / BEV_mass.sum()
 
-    f = plt.figure(figsize=(15,10))
+    f = plt.figure(figsize=(15, 10))
 
     ax = f.add_subplot(121)
 
     patches, texts = ax.pie(BEV_mass, colors=colors, startangle=90, radius=1.2)
-    ax.set_title('BEV SUV')
-    labels = ['{0} - {1:1.2f} %'.format(i,j) for i,j in zip(l_param, percent)]
+    ax.set_title("BEV SUV")
+    labels = ["{0} - {1:1.2f} %".format(i, j) for i, j in zip(l_param, percent)]
 
     sort_legend = True
     if sort_legend:
-        patches, labels, dummy =  zip(*sorted(zip(patches, labels, BEV_mass),
-                                              key=lambda x: x[2],
-                                              reverse=True))
+        patches, labels, dummy = zip(
+            *sorted(zip(patches, labels, BEV_mass), key=lambda x: x[2], reverse=True)
+        )
 
-    ax.legend(patches, labels, loc='upper left', bbox_to_anchor=(-0.1, 1.),
-               fontsize=8)
+    ax.legend(patches, labels, loc="upper left", bbox_to_anchor=(-0.1, 1.0), fontsize=8)
 
 
-    ICEV_d_mass = np.squeeze(cm.array.sel(size='SUV', powertrain='ICEV-d', year=2020,
-            parameter=l_param).values)
-    percent = 100.*ICEV_d_mass/ICEV_d_mass.sum()
+    ICEV_d_mass = np.squeeze(
+        cm.array.sel(size="SUV", powertrain="ICEV-d", year=2020, parameter=l_param).values
+    )
+    percent = 100.0 * ICEV_d_mass / ICEV_d_mass.sum()
 
     ax2 = f.add_subplot(122)
 
     patches, texts = ax2.pie(ICEV_d_mass, colors=colors, startangle=90, radius=1.2)
-    ax2.set_title('ICE-d SUV')
-    labels = ['{0} - {1:1.2f} %'.format(i,j) for i,j in zip(l_param, percent)]
+    ax2.set_title("ICE-d SUV")
+    labels = ["{0} - {1:1.2f} %".format(i, j) for i, j in zip(l_param, percent)]
 
     sort_legend = True
     if sort_legend:
-        patches, labels, dummy =  zip(*sorted(zip(patches, labels, ICEV_d_mass),
-                                              key=lambda x: x[2],
-                                              reverse=True))
+        patches, labels, dummy = zip(
+            *sorted(zip(patches, labels, ICEV_d_mass), key=lambda x: x[2], reverse=True)
+        )
 
-    ax2.legend(patches, labels, loc='upper left', bbox_to_anchor=(-0.1, 1.),
-               fontsize=8)
+    ax2.legend(patches, labels, loc="upper left", bbox_to_anchor=(-0.1, 1.0), fontsize=8)
 
     plt.subplots_adjust(wspace=1)
     plt.show()
