@@ -33,21 +33,21 @@ Driving cycle module
 .. image:: /_static/img/driving_cycle.png
     :width: 400
     :alt: Alternative text
-    
+
 Mass module
 -----------
 
 .. image:: /_static/img/mass_module.png
     :width: 900
     :alt: Alternative text
-    
+
 Auxiliary energy module
 -----------------------
 
 .. image:: /_static/img/aux_energy.png
     :width: 900
     :alt: Alternative text
-    
+
 Motive energy module
 --------------------
 

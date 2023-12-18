@@ -124,7 +124,7 @@ bibtex_default_style = "unsrt"
 bibtex_reference_style = "author_year"
 
 rst_epilog = """
-.. |br| raw:: html 
+.. |br| raw:: html
 
    <br>
 

@@ -8,19 +8,19 @@ Car Input Parameter
 
 .. autoclass:: carculator.car_input_parameters.VehicleInputParameters
     :members:
-    
+
 Array
 -----
 
 .. automodule:: carculator.array
     :members:
-    
+
 Driving cycle
 -------------
 
 .. automodule:: carculator.driving_cycles
     :members:
-    
+
 Energy consumption
 ------------------
 

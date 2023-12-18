@@ -6,7 +6,7 @@ Using Carculator
 Static vs. Stochastic mode
 --------------------------
 
-.. note:: 
+.. note::
 
     Many examples are given in this :download:`example notebook </_static/resources/examples.zip>` that you can run directly on your computer.
 
@@ -21,6 +21,7 @@ Creating car models in static mode will use the most likely value of the given p
 .. code-block:: python
 
    from carculator import *
+
    cip = VehicleInputParameters()
    cip.static()
    dcts, array = fill_xarray_from_input_parameters(cip)
@@ -33,6 +34,7 @@ Alternatively, if one wishes to work with probability distributions as parameter
 .. code-block:: python
 
     from carculator import *
+
     cip = VehicleInputParameters()
     cip.stochastic(800)
     dcts, array = fill_xarray_from_input_parameters(cip)
@@ -83,12 +85,15 @@ You need to create first a dictionary and define your new values as well as a pr
 .. code-block:: python
 
     dic_param = {
-    ('Glider', ['ICEV-d', 'ICEV-p'], 'Large', 'glider base mass', 'triangular'): {(2020, 'loc'): 1600.0,
-                                                                 (2020, 'minimum'): 1500.0,
-                                                                 (2020, 'maximum'): 2000.0,
-                                                                 (2040, 'loc'): 1500.0,
-                                                                 (2040, 'minimum'): 1300.0,
-                                                                 (2040, 'maximum'): 1700.0}}
+        ("Glider", ["ICEV-d", "ICEV-p"], "Large", "glider base mass", "triangular"): {
+            (2020, "loc"): 1600.0,
+            (2020, "minimum"): 1500.0,
+            (2020, "maximum"): 2000.0,
+            (2040, "loc"): 1500.0,
+            (2040, "minimum"): 1300.0,
+            (2040, "maximum"): 1700.0,
+        }
+    }
 
 Then, you simply pass this dictionary to `modify_xarray_from_custom_parameters(<dic_param or filepath>, array)`, like so:
 
@@ -98,7 +103,7 @@ Then, you simply pass this dictionary to `modify_xarray_from_custom_parameters(<
     cip.static()
     dcts, array = fill_xarray_from_input_parameters(cip)
     modify_xarray_from_custom_parameters(dic_param, array)
-    cm = CarModel(array, cycle='WLTC')
+    cm = CarModel(array, cycle="WLTC")
     cm.set_all()
 
 Alternatively, instead of a Python dictionary, you can pass a file path pointing to an Excel spreadsheet that contains
@@ -119,7 +124,9 @@ It is possible to inter and extrapolate all the parameters to other years simply
 
 .. code-block:: python
 
-    array = array.interp(year=[2018, 2022, 2035, 2040, 2045, 2050],  kwargs={'fill_value': 'extrapolate'})
+    array = array.interp(
+        year=[2018, 2022, 2035, 2040, 2045, 2050], kwargs={"fill_value": "extrapolate"}
+    )
 
 However, we do not recommend extrapolating for years before 2000 or beyond 2050.
 
@@ -136,7 +143,7 @@ To specify a driving cycle, simply do:
     cip = VehicleInputParameters()
     cip.static()
     dcts, array = fill_xarray_from_input_parameters(cip)
-    cm = CarModel(array, cycle='WLTC 3.4')
+    cm = CarModel(array, cycle="WLTC 3.4")
     cm.set_all()
 
 In this case, the driving cycle *WLTC 3.4* is chosen (this driving cycle is in fact a sub-part of the WLTC driving cycle,
@@ -159,9 +166,13 @@ The user can also create custom driving cycles and pass it to the :class:`CarMod
 .. code-block:: python
 
     import numpy as np
+
     x = np.linspace(1, 1000)
+
+
     def f(x):
         return np.sin(x) + np.random.normal(scale=20, size=len(x)) + 70
+
 
     cycle = f(x)
     cm = CarModel(array, cycle=cycle)
@@ -173,10 +184,15 @@ from the CarModel object:
 
 .. code-block:: python
 
-    TtW_energy = cm.array.sel(size='SUV', year=2020, parameter='TtW energy', value=0) * 1/3600 * 100
+    TtW_energy = (
+        cm.array.sel(size="SUV", year=2020, parameter="TtW energy", value=0)
+        * 1
+        / 3600
+        * 100
+    )
 
     plt.bar(TtW_energy.powertrain, TtW_energy)
-    plt.ylabel('kWh/100 km')
+    plt.ylabel("kWh/100 km")
     plt.show()
 
 .. image:: /_static/img/fig_kwh_100km.png
@@ -194,8 +210,8 @@ value for the tank-to-wheel energy, you would have a distribution of values:
 .. code-block:: python
 
     l_powertrains = TtW_energy.powertrain
-    [plt.hist(e, bins=50, alpha=.8, label=e.powertrain.values) for e in TtW_energy]
-    plt.ylabel('kWh/100 km')
+    [plt.hist(e, bins=50, alpha=0.8, label=e.powertrain.values) for e in TtW_energy]
+    plt.ylabel("kWh/100 km")
     plt.legend()
 
 .. image:: /_static/img/stochastic_example_ttw.png
@@ -210,29 +226,32 @@ List of all the given and calculated parameters of the car model:
 
 .. code-block:: python
 
-    list_param = cm.array.coords['parameter'].values.tolist()
+    list_param = cm.array.coords["parameter"].values.tolist()
 
 Return the parameters concerned with direct exhaust emissions (we remove noise emissions):
 
 .. code-block:: python
 
-    direct_emissions = [x for x in list_param if 'emission' in x and 'noise' not in x]
+    direct_emissions = [x for x in list_param if "emission" in x and "noise" not in x]
 
 Finally, return their values and display the first 10 in a table:
 
 .. code-block:: python
 
-    cm.array.sel(parameter=direct_emissions, year=2020, size='Van', powertrain='BEV').to_dataframe(name='direct emissions')
+    cm.array.sel(
+        parameter=direct_emissions, year=2020, size="Van", powertrain="BEV"
+    ).to_dataframe(name="direct emissions")
 
 Or we could be interested in visualizing the distribution of non-characterized noise emissions, in joules:
 
 .. code-block:: python
 
-    noise_emissions = [x for x in list_param if 'noise' in x]
-    data = cm.array.sel(parameter=noise_emissions, year=2020, size='Van', powertrain='ICEV-p', value=0)\
-        .to_dataframe(name='noise emissions')['noise emissions']
-    data[data>0].plot(kind='bar')
-    plt.ylabel('joules per km')
+    noise_emissions = [x for x in list_param if "noise" in x]
+    data = cm.array.sel(
+        parameter=noise_emissions, year=2020, size="Van", powertrain="ICEV-p", value=0
+    ).to_dataframe(name="noise emissions")["noise emissions"]
+    data[data > 0].plot(kind="bar")
+    plt.ylabel("joules per km")
 
 .. image:: /_static/img/example_noise_emissions.png
     :width: 400
@@ -247,7 +266,7 @@ of large diesel vehicles for 2010 and 2020:
 
 .. code-block:: python
 
-    cm.array.loc['Large','ICEV-d', 'driving mass', [2010, 2020]] = [[2000],[2200]]
+    cm.array.loc["Large", "ICEV-d", "driving mass", [2010, 2020]] = [[2000], [2200]]
 
 Characterization of inventories (static)
 ----------------------------------------
@@ -267,9 +286,10 @@ Hence, to plot the carbon footprint for all medium cars in 2020:
 
 .. code-block:: python
 
-    results.sel(size='Medium', year=2020, impact_category='climate change', value=0).to_dataframe('impact').unstack(level=1)['impact'].plot(kind='bar',
-                stacked=True)
-    plt.ylabel('kg CO2-eq./vkm')
+    results.sel(
+        size="Medium", year=2020, impact_category="climate change", value=0
+    ).to_dataframe("impact").unstack(level=1)["impact"].plot(kind="bar", stacked=True)
+    plt.ylabel("kg CO2-eq./vkm")
     plt.show()
 
 .. image:: /_static/img/example_carbon_footprint.png
@@ -293,20 +313,24 @@ stochastic mode (with 500 iterations and the driving cycle WLTC).
     cip = VehicleInputParameters()
     cip.stochastic(500)
     dcts, array = fill_xarray_from_input_parameters(cip)
-    cm = CarModel(array, cycle='WLTC')
+    cm = CarModel(array, cycle="WLTC")
     cm.set_all()
     scope = {
-        'powertrain':['BEV', 'PHEV'],
+        "powertrain": ["BEV", "PHEV"],
     }
     ic = InventoryCalculation(cm, scope=scope)
 
     results = ic.calculate_impacts()
 
-    data_MC = results.sel(impact_category='climate change').sum(axis=3).to_dataframe('climate change')
-    plt.style.use('seaborn')
-    data_MC.unstack(level=[0,1,2]).boxplot(showfliers=False, figsize=(20,5))
+    data_MC = (
+        results.sel(impact_category="climate change")
+        .sum(axis=3)
+        .to_dataframe("climate change")
+    )
+    plt.style.use("seaborn")
+    data_MC.unstack(level=[0, 1, 2]).boxplot(showfliers=False, figsize=(20, 5))
     plt.xticks(rotation=70)
-    plt.ylabel('kg CO2-eq./vkm')
+    plt.ylabel("kg CO2-eq./vkm")
 
 
 .. image:: /_static/img/example_stochastic_BEV_PHEV.png
@@ -334,8 +358,12 @@ Inventories can be exported as:
     # export the inventories as a Brightway2 object
     import_object = ic.export_lci_to_bw()
     # export the inventories as an Excel file (returns the file path of the created file)
-    filepath = ic.export_lci_to_excel(software_compatibility="brightway2", ecoinvent_version="3.7")
-    filepath = ic.export_lci_to_excel(software_compatibility="simapro", ecoinvent_version="3.6")
+    filepath = ic.export_lci_to_excel(
+        software_compatibility="brightway2", ecoinvent_version="3.7"
+    )
+    filepath = ic.export_lci_to_excel(
+        software_compatibility="simapro", ecoinvent_version="3.6"
+    )
 
 Export of inventories (stochastic)
 ----------------------------------
@@ -385,17 +413,21 @@ But in any case, the following script should successfully import the inventory i
 .. code-block:: python
 
     import brightway2 as bw
+
     bw.projects.set_current("test_carculator")
     import bw2io
+
     fp = r"C:\file_path_to_the_inventory\lci-test.xlsx"
 
     i = bw2io.ExcelImporter(fp)
     i.apply_strategies()
 
-    i.match_database("name_of_the_ecoinvent_db", fields=('name', 'unit', 'location', 'reference product'))
-    i.match_database("biosphere3", fields=('name', 'unit', 'categories'))
-    i.match_database("additional_biosphere", fields=('name', 'unit', 'categories'))
-    i.match_database(fields=('name', 'unit', 'location'))
+    i.match_database(
+        "name_of_the_ecoinvent_db", fields=("name", "unit", "location", "reference product")
+    )
+    i.match_database("biosphere3", fields=("name", "unit", "categories"))
+    i.match_database("additional_biosphere", fields=("name", "unit", "categories"))
+    i.match_database(fields=("name", "unit", "location"))
 
     i.statistics()
 

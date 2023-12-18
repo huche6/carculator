@@ -49,7 +49,7 @@ In the research field of mobility, LCA is widely used to investigate the superio
 
 ``carculator`` allows to:
 * produce [life cycle assessment (LCA)](https://en.wikipedia.org/wiki/Life-cycle_assessment) results that include conventional midpoint impact assessment indicators as well cost indicators
-*  ``carculator`` uses time- and energy scenario-differentiated background inventories for the future, based on outputs of Integrated Asessment Model [REMIND](https://www.pik-potsdam.de/research/transformation-pathways/models/remind/remind). 
+*  ``carculator`` uses time- and energy scenario-differentiated background inventories for the future, based on outputs of Integrated Asessment Model [REMIND](https://www.pik-potsdam.de/research/transformation-pathways/models/remind/remind).
 * calculate hot pollutant and noise emissions based on a specified driving cycle
 * produce error propagation analyzes (i.e., Monte Carlo) while preserving relations between inputs and outputs
 * control all the parameters sensitive to the foreground model (i.e., the vehicles) but also to the background model
@@ -84,22 +84,23 @@ Calculate the fuel efficiency (or ``Tank to wheel`` energy requirement) in km/L 
 over 800 Monte Carlo iterations:
 
 ```python
+from carculator import *
+import matplotlib.pyplot as plt
 
-    from carculator import *
-    import matplotlib.pyplot as plt
-    
-    cip = CarInputParameters()
-    cip.stochastic(800)
-    dcts, array = fill_xarray_from_input_parameters(cip)
-    cm = CarModel(array, cycle='WLTC 3.4')
-    cm.set_all()
-    TtW_energy = 1 / (cm.array.sel(size='SUV', year=2020, parameter='TtW energy') / 42000)  # assuming 42 MJ/L petrol
-    
-    l_powertrains = TtW_energy.powertrain
-    [plt.hist(e, bins=50, alpha=.8, label=e.powertrain.values) for e in TtW_energy]
-    plt.xlabel('km/L petrol-equivalent')
-    plt.ylabel('number of iterations')
-    plt.legend()
+cip = CarInputParameters()
+cip.stochastic(800)
+dcts, array = fill_xarray_from_input_parameters(cip)
+cm = CarModel(array, cycle="WLTC 3.4")
+cm.set_all()
+TtW_energy = 1 / (
+    cm.array.sel(size="SUV", year=2020, parameter="TtW energy") / 42000
+)  # assuming 42 MJ/L petrol
+
+l_powertrains = TtW_energy.powertrain
+[plt.hist(e, bins=50, alpha=0.8, label=e.powertrain.values) for e in TtW_energy]
+plt.xlabel("km/L petrol-equivalent")
+plt.ylabel("number of iterations")
+plt.legend()
 ```
 
 ![MC results](https://github.com/romainsacchi/carculator/blob/master/docs/_static/img/stochastic_example_ttw.png)
@@ -108,24 +109,28 @@ Compare the carbon footprint of electric vehicles with that of rechargeable hybr
 over 500 Monte Carlo iterations:
 
 ```python
+from carculator import *
 
-    from carculator import *
-    cip = CarInputParameters()
-    cip.stochastic(500)
-    dcts, array = fill_xarray_from_input_parameters(cip)
-    cm = CarModel(array, cycle='WLTC')
-    cm.set_all()
-    scope = {
-      'powertrain': ['BEV', 'PHEV'],
-    }
-    ic = InventoryCalculation(cm)
-    
-    results = ic.calculate_impacts()
-    data_MC = results.sel(impact_category='climate change').sum(axis=3).to_dataframe('climate change')
-    plt.style.use('seaborn')
-    data_MC.unstack(level=[0, 1, 2]).boxplot(showfliers=False, figsize=(20, 5))
-    plt.xticks(rotation=70)
-    plt.ylabel('kg CO2-eq./vkm')
+cip = CarInputParameters()
+cip.stochastic(500)
+dcts, array = fill_xarray_from_input_parameters(cip)
+cm = CarModel(array, cycle="WLTC")
+cm.set_all()
+scope = {
+    "powertrain": ["BEV", "PHEV"],
+}
+ic = InventoryCalculation(cm)
+
+results = ic.calculate_impacts()
+data_MC = (
+    results.sel(impact_category="climate change")
+    .sum(axis=3)
+    .to_dataframe("climate change")
+)
+plt.style.use("seaborn")
+data_MC.unstack(level=[0, 1, 2]).boxplot(showfliers=False, figsize=(20, 5))
+plt.xticks(rotation=70)
+plt.ylabel("kg CO2-eq./vkm")
 ```
 
 ![MC results](https://github.com/romainsacchi/carculator/blob/master/docs/_static/img/example_stochastic_BEV_PHEV.png)

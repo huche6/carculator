@@ -1,12 +1,7 @@
 import numpy as np
 import pytest
 
-from carculator import (
-    CarInputParameters,
-    CarModel,
-    InventoryCar,
-    fill_xarray_from_input_parameters,
-)
+from carculator import CarInputParameters, CarModel, InventoryCar, fill_xarray_from_input_parameters
 
 # generate vehicle parameters
 cip = CarInputParameters()
