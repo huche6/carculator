@@ -9,6 +9,14 @@ Submodules
     :toctree: _autosummary
 
 """
+from pathlib import Path
+
+from carculator_utils.array import fill_xarray_from_input_parameters
+from carculator_utils.driving_cycles import get_standard_driving_cycle_and_gradient
+
+from .car_input_parameters import CarInputParameters
+from .inventory import InventoryCar
+from .model import CarModel
 
 __all__ = (
     "CarInputParameters",
@@ -19,13 +27,5 @@ __all__ = (
 )
 __version__ = (1, 8, 5)
 
-from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
-
-from carculator_utils.array import fill_xarray_from_input_parameters
-from carculator_utils.driving_cycles import get_standard_driving_cycle_and_gradient
-
-from .car_input_parameters import CarInputParameters
-from .inventory import InventoryCar
-from .model import CarModel

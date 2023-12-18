@@ -56,9 +56,7 @@ class InventoryCar(Inventory):
         # Glider EoL + fuel tank
         self.A[
             :,
-            self.find_input_indices(
-                ("treatment of used glider, passenger car, shredding",)
-            ),
+            self.find_input_indices(("treatment of used glider, passenger car, shredding",)),
             self.find_input_indices(("Car, ",)),
         ] = (
             self.array[self.array_inputs["glider base mass"]]
@@ -71,16 +69,11 @@ class InventoryCar(Inventory):
         self.A[
             :,
             self.find_input_indices(
-                (
-                    "treatment of used internal combustion engine, passenger car, shredding",
-                )
+                ("treatment of used internal combustion engine, passenger car, shredding",)
             ),
             self.find_input_indices(("Car, ",)),
         ] = self.array[
-            [
-                self.array_inputs[l]
-                for l in ["combustion engine mass", "powertrain mass"]
-            ],
+            [self.array_inputs[line] for line in ["combustion engine mass", "powertrain mass"]],
             :,
         ].sum(
             axis=0
@@ -97,9 +90,7 @@ class InventoryCar(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for converter, for electric passenger car",)
-            ),
+            self.find_input_indices(("market for converter, for electric passenger car",)),
             self.find_input_indices(("Car, ",)),
         ] = (
             self.array[self.array_inputs["converter mass"], :] * -1
@@ -107,9 +98,7 @@ class InventoryCar(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for electric motor, electric passenger car",)
-            ),
+            self.find_input_indices(("market for electric motor, electric passenger car",)),
             self.find_input_indices(("Car, ",)),
         ] = (
             self.array[self.array_inputs["electric engine mass"], :] * -1
@@ -117,9 +106,7 @@ class InventoryCar(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for inverter, for electric passenger car",)
-            ),
+            self.find_input_indices(("market for inverter, for electric passenger car",)),
             self.find_input_indices(("Car, ",)),
         ] = (
             self.array[self.array_inputs["inverter mass"], :] * -1
@@ -150,25 +137,18 @@ class InventoryCar(Inventory):
         self.A[
             :,
             self.find_input_indices(
-                (
-                    "market for used powertrain from electric passenger car, manual dismantling",
-                )
+                ("market for used powertrain from electric passenger car, manual dismantling",)
             ),
             self.find_input_indices(("Car, ",)),
-        ] = self.array[[self.array_inputs[l] for l in l_elec_pt], :].sum(axis=0)
+        ] = self.array[[self.array_inputs[line] for line in l_elec_pt], :].sum(axis=0)
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for internal combustion engine, passenger car",)
-            ),
+            self.find_input_indices(("market for internal combustion engine, passenger car",)),
             self.find_input_indices(("Car, ",)),
         ] = (
             self.array[
-                [
-                    self.array_inputs[l]
-                    for l in ["combustion engine mass", "powertrain mass"]
-                ],
+                [self.array_inputs[line] for line in ["combustion engine mass", "powertrain mass"]],
                 :,
             ].sum(axis=0)
         ) * -1
@@ -184,12 +164,8 @@ class InventoryCar(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                contains=("polyethylene production, high density, granulate",)
-            ),
-            self.find_input_indices(
-                contains=("Car, ",), excludes=("BEV", "ICEV-g", "FCEV")
-            ),
+            self.find_input_indices(contains=("polyethylene production, high density, granulate",)),
+            self.find_input_indices(contains=("Car, ",), excludes=("BEV", "ICEV-g", "FCEV")),
         ] = (
             self.array[self.array_inputs["fuel tank mass"], :, index] * -1
         )
@@ -227,8 +203,7 @@ class InventoryCar(Inventory):
                     (f"transport, {self.vm.vehicle_type}, ", "ICEV-g", str(year))
                 ),
             ] *= (
-                1
-                + self.array[self.array_inputs["CNG pump-to-tank leakage"], :, cng_idx]
+                1 + self.array[self.array_inputs["CNG pump-to-tank leakage"], :, cng_idx]
             )
 
         # Gas leakage to air

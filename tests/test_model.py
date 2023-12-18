@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from carculator import *
+from carculator import CarInputParameters, CarModel, fill_xarray_from_input_parameters
 
 DATA = Path(__file__, "..").resolve() / "fixtures" / "cars_values.xlsx"
 OUTPUT = Path(__file__, "..").resolve() / "fixtures" / "test_model_results.xlsx"
@@ -67,7 +67,7 @@ def test_model_results():
                             .values.astype(float)
                             .item(0)
                         )
-                    except:
+                    except Exception:
                         ref_val = 1
 
                     _ = lambda x: np.where(ref_val == 0, 1, ref_val)
@@ -143,11 +143,11 @@ def test_setting_range():
         scope={"size": ["Medium"], "powertrain": ["BEV"], "year": [2020]},
     )
 
-    range = {
+    json_range = {
         ("BEV", "Medium", 2020): 100,
     }
 
-    cm = CarModel(arr, cycle="WLTC", target_range=range)
+    cm = CarModel(arr, cycle="WLTC", target_range=json_range)
     cm.set_all()
 
     assert (
@@ -309,10 +309,7 @@ def test_setting_power():
 
     assert np.array_equal(
         cm["combustion engine mass"],
-        (
-            cm["combustion power"] * cm["combustion mass per power"]
-            + cm["combustion fixed mass"]
-        ),
+        (cm["combustion power"] * cm["combustion mass per power"] + cm["combustion fixed mass"]),
     )
 
 

@@ -148,9 +148,7 @@ def test_fuel_blend():
             ]
         ),
     )
-    assert np.array_equal(
-        cm.fuel_blend["cng"]["primary"]["share"], np.array([1, 1, 1, 1, 1, 1])
-    )
+    assert np.array_equal(cm.fuel_blend["cng"]["primary"]["share"], np.array([1, 1, 1, 1, 1, 1]))
     assert np.allclose(np.sum(cm.fuel_blend["cng"]["secondary"]["share"]), np.zeros(6))
 
     for fuels in [
@@ -272,7 +270,7 @@ def test_export_to_bw():
         "3.7",
         "3.8",
     ):
-        for c in (True, False):
+        for _c in (True, False):
             ic.export_lci(
                 ecoinvent_version=b,
             )

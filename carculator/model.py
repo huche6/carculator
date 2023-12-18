@@ -11,8 +11,8 @@ from . import DATA_DIR
 class CarModel(VehicleModel):
     """Represent the vehicles fleet.
 
-    This class represents the entirety of the vehicles considered, with useful attributes, such as an array that stores
-    all the vehicles parameters.
+    This class represents the entirety of the vehicles considered, with useful attributes,
+    such as an array that stores all the vehicles parameters.
 
     :ivar array: multi-dimensional numpy-like array that contains parameters' value(s)
     :ivar cycle: name of a driving cycle, or custom driving cycle
@@ -24,20 +24,23 @@ class CarModel(VehicleModel):
     def set_all(self):
         """Methods to obtain the tank-to-wheel requirements.
 
-        This method runs a series of other methods to obtain the tank-to-wheel energy requirement, efficiency
-        of the car, costs, etc.
+        This method runs a series of other methods to obtain the tank-to-wheel energy requirement,
+        efficiency of the car, costs, etc.
 
-        :meth:`set_component_masses()`, :meth:`set_car_masses()` and :meth:`set_power_parameters()` are interdependent.
-        `powertrain_mass` depends on `power`, `curb_mass` is affected by changes in `powertrain_mass`,
-        `combustion engine mass` and `electric engine mass`, and `power` is a function of `curb_mass`.
+        :meth:`set_component_masses()`, :meth:`set_car_masses()` and :meth:`set_power_parameters()`
+        are interdependent.
+        `powertrain_mass` depends on `power`, `curb_mass` is affected by changes in
+        `powertrain_mass`,
+        `combustion engine mass` and `electric engine mass`, and `power` is a function of `
+        curb_mass`.
         The current solution is to loop through the methods until the increment in driving mass is
         inferior to 0.1%.
 
-        :param drop_hybrids: boolean. True by default. If False, the underlying vehicles used to build plugin-hybrid
-                vehicles remain present in the array.
-        :param electric_utility_factor: array. If an array is passed, its values are used to override the
-                electric utility factor for plugin hybrid vehicles. If not, this factor is calculated using a relation
-                described in `set_electric_utility_factor()`
+        :param drop_hybrids: boolean. True by default. If False, the underlying vehicles used
+                to build plugin-hybrid vehicles remain present in the array.
+        :param electric_utility_factor: array. If an array is passed, its values are used to
+                override the electric utility factor for plugin hybrid vehicles. If not, this
+                factor is calculated using a relation described in `set_electric_utility_factor()`
 
         :returns: Does not return anything. Modifies ``self.array`` in place.
 
@@ -126,8 +129,8 @@ class CarModel(VehicleModel):
     def adjust_cost(self) -> None:
         """Adjust costs of energy storage over time.
 
-        This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
-        interpolation between years.
+        This method adjusts costs of energy storage over time, to correct for the overly
+        optimistic linear interpolation between years.
 
         """
 
@@ -148,34 +151,25 @@ class CarModel(VehicleModel):
         # Correction of hydrogen tank cost, per kg
         # Correction of fuel cell stack cost, per kW
         if "FCEV" in self.array.powertrain:
-            self.array.loc[
-                dict(powertrain="FCEV", parameter="fuel tank cost per kg")
-            ] = np.reshape(
-                (1.078e58 * np.exp(-6.32e-2 * self.array.year.values) + 3.43e2)
-                * cost_factor,
+            self.array.loc[dict(powertrain="FCEV", parameter="fuel tank cost per kg")] = np.reshape(
+                (1.078e58 * np.exp(-6.32e-2 * self.array.year.values) + 3.43e2) * cost_factor,
                 (1, n_year, n_iterations),
             )
 
-            self.array.loc[
-                dict(powertrain="FCEV", parameter="fuel tank cost per kg")
-            ] = np.reshape(
-                (3.15e66 * np.exp(-7.35e-2 * self.array.year.values) + 2.39e1)
-                * cost_factor,
+            self.array.loc[dict(powertrain="FCEV", parameter="fuel tank cost per kg")] = np.reshape(
+                (3.15e66 * np.exp(-7.35e-2 * self.array.year.values) + 2.39e1) * cost_factor,
                 (1, n_year, n_iterations),
             )
 
         # Correction of energy battery system cost, per kWh
         list_batt = [
-            i
-            for i in ["BEV", "PHEV-e", "PHEV-c-p", "PHEV-c-d"]
-            if i in self.array.powertrain
+            i for i in ["BEV", "PHEV-e", "PHEV-c-p", "PHEV-c-d"] if i in self.array.powertrain
         ]
         if len(list_batt) > 0:
             self.array.loc[
                 dict(powertrain=list_batt, parameter="energy battery cost per kWh")
             ] = np.reshape(
-                (2.75e86 * np.exp(-9.61e-2 * self.array.year.values) + 5.059e1)
-                * cost_factor,
+                (2.75e86 * np.exp(-9.61e-2 * self.array.year.values) + 5.059e1) * cost_factor,
                 (1, 1, n_year, n_iterations),
             )
 
@@ -199,8 +193,7 @@ class CarModel(VehicleModel):
             self.array.loc[
                 dict(powertrain=list_pwt, parameter="power battery cost per kW")
             ] = np.reshape(
-                (8.337e40 * np.exp(-4.49e-2 * self.array.year.values) + 11.17)
-                * cost_factor,
+                (8.337e40 * np.exp(-4.49e-2 * self.array.year.values) + 11.17) * cost_factor,
                 (1, 1, n_year, n_iterations),
             )
 
@@ -210,8 +203,7 @@ class CarModel(VehicleModel):
                 dict(powertrain="ICEV-g", parameter="combustion powertrain cost per kW")
             ] = np.clip(
                 np.reshape(
-                    (5.92e160 * np.exp(-0.1819 * self.array.year.values) + 26.76)
-                    * cost_factor,
+                    (5.92e160 * np.exp(-0.1819 * self.array.year.values) + 26.76) * cost_factor,
                     (1, n_year, n_iterations),
                 ),
                 None,
@@ -222,7 +214,8 @@ class CarModel(VehicleModel):
         """Compute the required energy to operate auxiliary services and to move the car.
 
         This method calculates the energy required to operate auxiliary services as well
-        as to move the car. The sum is stored under the parameter label "TtW energy" in :attr:`self.array`.
+        as to move the car. The sum is stored under the parameter label "TtW energy" in
+        :attr:`self.array`.
 
         """
 
@@ -472,7 +465,8 @@ class CarModel(VehicleModel):
 
         Define ``curb mass``, ``driving mass``, and ``total cargo mass``.
 
-            * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle and fuel, without people or cargo.
+            * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle
+            and fuel, without people or cargo.
             * ``total cargo mass`` is the mass of the cargo and passengers.
             * ``driving mass`` is the ``curb mass`` plus ``total cargo mass``.
 
@@ -509,8 +503,7 @@ class CarModel(VehicleModel):
             self.override_vehicle_mass()
 
         self["total cargo mass"] = (
-            self["average passengers"] * self["average passenger mass"]
-            + self["cargo mass"]
+            self["average passengers"] * self["average passenger mass"] + self["cargo mass"]
         )
         self["driving mass"] = self["curb mass"] + self["total cargo mass"]
 
@@ -546,10 +539,7 @@ class CarModel(VehicleModel):
                 )
             else:
                 for key, val in self.electric_utility_factor.items():
-                    if (
-                        "PHEV-e" in self.array.powertrain.values
-                        and key in self.array.year.values
-                    ):
+                    if "PHEV-e" in self.array.powertrain.values and key in self.array.year.values:
                         self.array.loc[
                             dict(
                                 powertrain="PHEV-e",
@@ -564,8 +554,7 @@ class CarModel(VehicleModel):
         :return:
         """
         self["glider cost"] = (
-            self["glider base mass"] * self["glider cost slope"]
-            + self["glider cost intercept"]
+            self["glider base mass"] * self["glider cost slope"] + self["glider cost intercept"]
         )
         self["lightweighting cost"] = (
             self["glider base mass"]
@@ -579,9 +568,7 @@ class CarModel(VehicleModel):
             self["combustion power"] * self["combustion powertrain cost per kW"]
         )
         self["fuel cell cost"] = self["fuel cell power"] * self["fuel cell cost per kW"]
-        self["power battery cost"] = (
-            self["battery power"] * self["power battery cost per kW"]
-        )
+        self["power battery cost"] = self["battery power"] * self["power battery cost per kW"]
         self["energy battery cost"] = (
             self["energy battery cost per kWh"] * self["electric energy stored"]
         )
@@ -616,10 +603,7 @@ class CarModel(VehicleModel):
         # per km
         amortisation_factor = self["interest rate"] + (
             self["interest rate"]
-            / (
-                (np.array(1) + self["interest rate"]) ** self["lifetime kilometers"]
-                - np.array(1)
-            )
+            / ((np.array(1) + self["interest rate"]) ** self["lifetime kilometers"] - np.array(1))
         )
         self["amortised purchase cost"] = (
             self["purchase cost"] * amortisation_factor / self["kilometers per year"]
@@ -637,10 +621,7 @@ class CarModel(VehicleModel):
         self["amortised component replacement cost"] = (
             (
                 self["component replacement cost"]
-                * (
-                    (np.array(1) - self["interest rate"]) ** self["lifetime kilometers"]
-                    / 2
-                )
+                * ((np.array(1) - self["interest rate"]) ** self["lifetime kilometers"] / 2)
             )
             * amortisation_factor
             / self["kilometers per year"]
@@ -717,9 +698,7 @@ class CarModel(VehicleModel):
             ] = 0
 
             # replace Nans with zeros
-            self.array.loc[dict(size="Micro")] = self.array.loc[
-                dict(size="Micro")
-            ].fillna(0)
+            self.array.loc[dict(size="Micro")] = self.array.loc[dict(size="Micro")].fillna(0)
 
         if "BEV" in self.array.coords["powertrain"].values:
             # set the `TtW energy` of BEV vehicles before 2010 to zero

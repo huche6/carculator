@@ -1,0 +1,10 @@
+name: carculator
+channels:
+  - conda-forge
+  - romainsacchi
+dependencies:
+  - pytest
+  - flake8
+  - isort
+  - black
+  - pre-commit
