@@ -1,8 +1,10 @@
-"""
-car_input_parameters.py contains the VehicleInputParameters class, which, after instantiated, contains
+"""Definition and values of inputs and calcuted parameters.
+
+Contains the VehicleInputParameters class, which, after instantiated, contains
 all definitions (metadata) of input and calculated parameters, along with their values.
 Also, it inherits methods from `klausen`, which exposes the methods .static() and .stochastic(),
 which generate single or random values for input parameters.
+
 """
 
 import json
@@ -13,8 +15,8 @@ from carculator_utils.vehicle_input_parameters import VehicleInputParameters
 
 
 def load_parameters(obj: Union[str, Path, list]) -> list:
-    """
-    Returns a json object containing parameters' definitions
+    """Return a json object containing parameters' definitions.
+
     :param obj: A filepath to a json file, or a json object
     :return: Returns a json object containing parameters' definitions
     """
@@ -27,7 +29,7 @@ def load_parameters(obj: Union[str, Path, list]) -> list:
 
 
 class CarInputParameters(VehicleInputParameters):
-    """ """
+    """Car input parameters."""
 
     DEFAULT = Path(__file__, "..").resolve() / "data" / "default_parameters.json"
     EXTRA = Path(__file__, "..").resolve() / "data" / "extra_parameters.json"

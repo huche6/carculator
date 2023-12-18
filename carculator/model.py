@@ -9,7 +9,8 @@ from . import DATA_DIR
 
 
 class CarModel(VehicleModel):
-    """
+    """Represent the vehicles fleet.
+
     This class represents the entirety of the vehicles considered, with useful attributes, such as an array that stores
     all the vehicles parameters.
 
@@ -21,7 +22,8 @@ class CarModel(VehicleModel):
     """
 
     def set_all(self):
-        """
+        """Methods to obtain the tank-to-wheel requirements.
+
         This method runs a series of other methods to obtain the tank-to-wheel energy requirement, efficiency
         of the car, costs, etc.
 
@@ -122,7 +124,8 @@ class CarModel(VehicleModel):
             self.energy_storage.update({"origin": "CN"})
 
     def adjust_cost(self) -> None:
-        """
+        """Adjust costs of energy storage over time.
+
         This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
         interpolation between years.
 
@@ -216,7 +219,8 @@ class CarModel(VehicleModel):
             )
 
     def calculate_ttw_energy(self) -> None:
-        """
+        """Compute the required energy to operate auxiliary services and to move the car.
+
         This method calculates the energy required to operate auxiliary services as well
         as to move the car. The sum is stored under the parameter label "TtW energy" in :attr:`self.array`.
 
@@ -464,7 +468,8 @@ class CarModel(VehicleModel):
         ).T
 
     def set_vehicle_mass(self) -> None:
-        """
+        """Compute the curb, driving and total cargo weights.
+
         Define ``curb mass``, ``driving mass``, and ``total cargo mass``.
 
             * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle and fuel, without people or cargo.
@@ -510,7 +515,8 @@ class CarModel(VehicleModel):
         self["driving mass"] = self["curb mass"] + self["total cargo mass"]
 
     def set_electric_utility_factor(self) -> None:
-        """Set the electric utility factor according to a sampled values in Germany (ICTT 2022)
+        """Set the electric utility factor according to a sampled values in Germany (ICTT 2022).
+
         https://theicct.org/wp-content/uploads/2022/06/real-world-phev-use-jun22-1.pdf
 
         Real-world range in simulation 20 km 30 km 40 km 50 km 60 km 70 km 80 km
@@ -522,7 +528,8 @@ class CarModel(VehicleModel):
         (the range that can be driven in battery-depleting mode).
 
         The argument `uf` is used to override this relation, if needed.
-        `uf` must be a ratio between 0 and .75, for each."""
+        `uf` must be a ratio between 0 and .75, for each.
+        """
 
         if "PHEV-e" in self.array.coords["powertrain"].values:
             if self.electric_utility_factor is None:
@@ -552,8 +559,8 @@ class CarModel(VehicleModel):
                         ] = val
 
     def set_costs(self) -> None:
-        """
-        Calculate the different cost types.
+        """Calculate the different cost types.
+
         :return:
         """
         self["glider cost"] = (
@@ -647,7 +654,8 @@ class CarModel(VehicleModel):
         )
 
     def remove_energy_consumption_from_unavailable_vehicles(self):
-        """
+        """Set energy consumption of unused vehicles to zero.
+
         This method sets the energy consumption of vehicles that are not available to zero.
         """
 

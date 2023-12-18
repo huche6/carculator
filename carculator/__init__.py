@@ -1,11 +1,12 @@
-"""
+"""Carculator init file.
+
+List of all submodules.
 
 Submodules
 ==========
 
 .. autosummary::
     :toctree: _autosummary
-
 
 """
 

@@ -1,5 +1,6 @@
-"""
-inventory.py contains Inventory which provides all methods to solve inventories.
+"""Methods to solve inventories.
+
+It contains Inventory which provides all methods to solve inventories.
 """
 
 import numpy as np
@@ -13,15 +14,16 @@ IAM_FILES_DIR = DATA_DIR / "IAM"
 
 
 class InventoryCar(Inventory):
-    """
+    """Result characterization and inventory export.
+
     Build and solve the inventory for results
     characterization and inventory export
-
     """
 
     def fill_in_A_matrix(self):
-        """
-        Fill-in the A matrix. Does not return anything. Modifies in place.
+        """Fill-in the A matrix.
+
+        Does not return anything. Modifies in place.
         Shape of the A matrix (values, products, activities).
 
         :param array: :attr:`array` from :class:`CarModel` class
