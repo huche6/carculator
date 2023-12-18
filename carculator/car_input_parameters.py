@@ -39,5 +39,8 @@ class CarInputParameters(VehicleInputParameters):
         parameters: Union[str, Path, list] = None,
         extra: Union[str, Path, list] = None,
     ) -> None:
-        """Create a `klausen <https://github.com/cmutel/klausen>`__ model with the car input parameters."""
+        """Init model with car input parameters.
+
+        Create a `klausen <https://github.com/cmutel/klausen>`__ model with car input parameters.
+        """
         super().__init__(None)
