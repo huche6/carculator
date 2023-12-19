@@ -1,11 +1,12 @@
 from itertools import product
+from pathlib import Path
 
 import numpy as np
 import yaml
 from carculator_utils.energy_consumption import EnergyConsumptionModel
 from carculator_utils.model import VehicleModel
 
-from . import DATA_DIR
+from . import data as data_carculator
 
 
 class CarModel(VehicleModel):
@@ -588,7 +589,9 @@ class CarModel(VehicleModel):
             + self["fuel cell cost"] * self["fuel cell lifetime replacements"]
         )
 
-        with open(DATA_DIR / "purchase_cost_params.yaml", "r") as stream:
+        with open(
+            Path(data_carculator.__file__).parent / "purchase_cost_params.yaml", "r"
+        ) as stream:
             to_markup = yaml.safe_load(stream)["markup"]
 
         self[to_markup] *= self["markup factor"]
@@ -596,7 +599,9 @@ class CarModel(VehicleModel):
         # calculate costs per km:
         self["lifetime"] = self["lifetime kilometers"] / self["kilometers per year"]
 
-        with open(DATA_DIR / "purchase_cost_params.yaml", "r") as stream:
+        with open(
+            Path(data_carculator.__file__).parent / "purchase_cost_params.yaml", "r"
+        ) as stream:
             purchase_cost_params = yaml.safe_load(stream)["purchase"]
 
         self["purchase cost"] = self[purchase_cost_params].sum(axis=2)

@@ -6,11 +6,7 @@ It contains Inventory which provides all methods to solve inventories.
 import numpy as np
 from carculator_utils.inventory import Inventory
 
-from . import DATA_DIR
-
 np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
-
-IAM_FILES_DIR = DATA_DIR / "IAM"
 
 
 class InventoryCar(Inventory):

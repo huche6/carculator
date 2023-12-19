@@ -26,6 +26,3 @@ __all__ = (
     "get_standard_driving_cycle_and_gradient",
 )
 __version__ = (1, 8, 5)
-
-
-DATA_DIR = Path(__file__).resolve().parent / "data"
