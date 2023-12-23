@@ -71,11 +71,3 @@ class VehicleModel(System):
         self.add_inward("fuel_blend", None, dtype=dict)
         self.add_inward("ambiant_temperature", None, dtype=float)
         self.add_inward("indoor_temperature", 20.0, dtype=float)
-
-    @property
-    def array(self):
-        return self._array
-
-    @array.setter
-    def array(self, dict_array):
-        self._array = xr.DataArray.from_dict(dict_array)
