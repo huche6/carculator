@@ -57,7 +57,6 @@ class CarModel(VehicleModel):
         )
 
         diff = 1.0
-
         while diff > 0.00001:
             old_driving_mass = self["driving mass"].sum().values
             self.set_vehicle_mass()
