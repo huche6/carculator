@@ -6,7 +6,7 @@ from carculator.systems.glider import Glider
 from carculator.systems.auxiliaries import Auxiliaries
 from carculator.systems.vehicle.vehicle_weight import VehicleWeight
 from carculator.systems.vehicle.vehicle_dynamic import Dynamics
-from carculator.systems.energy_chain import EnergyDistribution
+from carculator.systems.energy_chain import EnergyDistribution, Transmission
 
 
 class VehicleModel(System):
@@ -19,10 +19,12 @@ class VehicleModel(System):
             VehicleWeight("vehicle_weight"),
             pulling=["curb_mass", "total_cargo_mass", "driving_mass"],
         )
-        self.add_child(Dynamics("vehicle_dynamic"), pulling=["speed"])
         self.add_child(
-            Powertrain("powertrain", type=powertrain), pulling=["curb_mass", "speed"]
+            Powertrain("powertrain", type=powertrain),
+            pulling=["curb_mass", "speed", "engine_load"],
         )
+        self.add_child(Dynamics("vehicle_dynamic"), pulling=["speed"])
+        self.add_child(Transmission("transmission"), pulling=["engine_load"])
         self.add_child(EnergyDistribution("energy_distribution"))
         self.add_child(Auxiliaries("auxiliaries"), pulling=["mass_out"])
 
@@ -36,7 +38,10 @@ class VehicleModel(System):
         self.connect(
             self.powertrain.inwards,
             self.vehicle_dynamic.outwards,
-            ["motive_energy", "engine_efficiency"],
+            "motive_energy",
+        )
+        self.connect(
+            self.vehicle_dynamic.inwards, self.powertrain.outwards, "engine_efficiency"
         )
         # design method
         # design = self.add_design_method("scale_mass")

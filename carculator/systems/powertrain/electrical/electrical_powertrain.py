@@ -19,6 +19,7 @@ class ElectricalPowertrain(System):
                 "speed": "speed",
                 "motive_energy": "motive_energy",
                 "efficiency": "engine_efficiency",
+                "engine_load": "engine_load",
             },
         )
         self.add_child(Battery("battery"), pulling=["combustion_power_share"])

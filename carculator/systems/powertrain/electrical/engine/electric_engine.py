@@ -11,9 +11,9 @@ class ElectricEngine(System):
         self.add_inward("electric_mass_per_power", 1.0)
         self.add_inward("electric_fixed_mass", 1.0)
         self.add_inward("combustion_power_share")
-        self.add_inward("speed", unit="m/s")
-        self.add_inward("load")
-        self.add_inward("motive_energy")
+        self.add_inward("speed", 50.0, unit="m/s")
+        self.add_inward("engine_load", 1.0)
+        self.add_inward("motive_energy", 1.0)
         self.add_inward("dict_efficiencies", {0.0: 0.0, 1.0: 1.0}, dtype=dict)
 
         self.add_inward("power", 1.0)
@@ -22,8 +22,10 @@ class ElectricEngine(System):
         self.add_outward("engine_power")
         self.add_outward("efficiency")
 
-        self.add_unknown("load")
-        self.add_equation("speed - load*engine_power/motive_energy == 0")
+        self.add_unknown("engine_load")
+        self.add_equation(
+            "speed - engine_load*engine_power/motive_energy == engine_load"
+        )
 
     def compute(self):
         # Mass
@@ -36,7 +38,7 @@ class ElectricEngine(System):
         )
 
         self.efficiency = np.interp(
-            self.load,
+            self.engine_load,
             np.array(list(self.dict_efficiencies.keys())),
             np.array(list(self.dict_efficiencies.values())),
         )

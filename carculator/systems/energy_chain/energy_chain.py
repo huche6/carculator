@@ -1,5 +1,6 @@
 from cosapp.base import System
 from carculator.ports import Mass
+import numpy as np
 
 
 class EnergyDistribution(System):
@@ -18,8 +19,15 @@ class Transmission(System):
         self.add_inward("fuel_cell_system_efficiency")
         self.add_inward("transmission_efficiency")
         self.add_inward("engine_efficiency")
+        self.add_inward("engine_load")
+        self.add_inward("dict_efficiencies", {0.0: 0.0, 1.0: 1.0}, dtype=dict)
 
         self.add_outward("ttw_efficiency")
+        self.add_outward("efficiency", unit="")
 
     def compute(self):
-        return
+        self.efficiency = np.interp(
+            self.engine_load,
+            np.array(list(self.dict_efficiencies.keys())),
+            np.array(list(self.dict_efficiencies.values())),
+        )

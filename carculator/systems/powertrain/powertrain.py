@@ -33,7 +33,7 @@ class Powertrain(System):
         if type in ["HEV-p", "HEV-d", "BEV", "FCEV"]:
             self.add_child(
                 ElectricalPowertrain("electrical_powertrain"),
-                pulling=["speed", "motive_energy", "engine_efficiency"],
+                pulling=["speed", "motive_energy", "engine_efficiency", "engine_load"],
             )
             self.connect(
                 self.electrical_powertrain.inwards,

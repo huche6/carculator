@@ -14,7 +14,7 @@ class Dynamics(System):
         # inwards/outwards
         self.add_inward("dt", 0.1, unit="s")
         self.add_inward("pos", 0.0, unit="m")
-        self.add_inward("speed", np.array([50.0]), unit="m/s")
+        self.add_inward("speed", 50.0, unit="m/s")
         self.add_inward("force", 1.0, unit="N")
 
         self.add_inward("input_time", 1.0, dtype=(float, np.ndarray))
@@ -67,16 +67,6 @@ class Dynamics(System):
             return cls.from_data(name, data)
 
     def compute(self):
-        # if isinstance(self.input_time, np.ndarray):
-        #    time_index = np.where(np.isclose(self.input_time, self.t))[0][0]
-        #    self.velocity = self.input_velocity[time_index]
-        #    print(time_index, self.velocity)
-        if isinstance(self.speed, np.ndarray) and len(self.speed) > 1:
-            self.acceleration = np.zeros_like(self.speed)
-            self.acceleration[1:-1] = (self.speed[2:] - self.speed[0:-2]) / (
-                2 * self.dt
-            )
-
         self.rolling_resistance = (
             self.driving_mass * self.rolling_resistance_coeff * g * (self.speed > 0)
         )
