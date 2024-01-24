@@ -14,7 +14,7 @@ class Dynamics(System):
         # inwards/outwards
         self.add_inward("dt", 0.1, unit="s")
         self.add_inward("pos", 0.0, unit="m")
-        self.add_inward("velocity", np.array([1.0]), unit="m/s")
+        self.add_inward("speed", np.array([50.0]), unit="m/s")
         self.add_inward("force", 1.0, unit="N")
 
         self.add_inward("input_time", 1.0, dtype=(float, np.ndarray))
@@ -29,15 +29,19 @@ class Dynamics(System):
 
         self.add_inward("gradient", 1.0, dtype=(float, np.ndarray), unit="rad")
 
+        self.add_inward("engine_efficiency", unit="")
+        self.add_inward("transmission_efficiency", unit="")
+
         # outwards
         self.add_outward("rolling_resistance", unit="N")
         self.add_outward("air_resistance", unit="N")
         self.add_outward("gradient_resistance", unit="N")
         self.add_outward("total_resistance", unit="N")
+        self.add_outward("inertia", unit="N")
 
         self.add_outward("motive_energy", unit="W*h")
         # transients
-        self.add_outward("acceleration", np.zeros_like(self.velocity), unit="m/s**2")
+        self.add_outward("acceleration", np.zeros_like(self.speed), unit="m/s**2")
         # self.add_transient("pos", der="velocity")
         # self.add_rate("acceleration", source="velocity")
 
@@ -67,20 +71,20 @@ class Dynamics(System):
         #    time_index = np.where(np.isclose(self.input_time, self.t))[0][0]
         #    self.velocity = self.input_velocity[time_index]
         #    print(time_index, self.velocity)
-        if isinstance(self.velocity, np.ndarray) and len(self.velocity) > 1:
-            self.acceleration = np.zeros_like(self.velocity)
-            self.acceleration[1:-1] = (
-                self.velocity[2:] - self.velocity[0:-2]
-            ) / self.dt
+        if isinstance(self.speed, np.ndarray) and len(self.speed) > 1:
+            self.acceleration = np.zeros_like(self.speed)
+            self.acceleration[1:-1] = (self.speed[2:] - self.speed[0:-2]) / (
+                2 * self.dt
+            )
 
         self.rolling_resistance = (
-            self.driving_mass * self.rolling_resistance_coeff * g * (self.velocity > 0)
+            self.driving_mass * self.rolling_resistance_coeff * g * (self.speed > 0)
         )
         self.air_resistance = (
-            self.frontal_area * self.drag_coef * self.rho / 2.0 * self.velocity**2.0
+            self.frontal_area * self.drag_coef * self.rho / 2.0 * self.speed**2.0
         )
         self.gradient_resistance = (
-            self.driving_mass * g * np.sin(self.gradient) * (self.velocity > 0)
+            self.driving_mass * g * np.sin(self.gradient) * (self.speed > 0)
         )
 
         self.inertia = self.acceleration * self.driving_mass
@@ -91,3 +95,5 @@ class Dynamics(System):
             + self.gradient_resistance
             + self.inertia
         )
+
+        # self.motive_energy_at_wheels = np.maximum(self.total_resistance, 0.0)

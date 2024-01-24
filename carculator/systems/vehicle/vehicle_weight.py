@@ -7,6 +7,7 @@ class VehicleWeight(System):
         self.add_inward("average_passengers", 1.5, unit="")
         self.add_inward("average_passengers_mass", 70, unit="kg")
         self.add_inward("curb_mass", unit="kg")
+        self.add_inward("charger_mass", unit="kg", desc="mass of the electric onboard")
 
         self.add_outward("total_cargo_mass", unit="kg")
         self.add_outward("driving_mass", unit="kg")

@@ -15,7 +15,6 @@ class Glider(System):
         vehicle_size=None,
         cycle_name=None,
     ):
-        self.add_input(Mass, "mass_in")
         self.add_output(Mass, "mass_out")
 
         self.add_inward("vehicle_type", detect_vehicle_type(vehicle_size))
@@ -28,6 +27,7 @@ class Glider(System):
         )
 
         self.add_inward("mass", 1.0, dtype=float)
+        self.add_inward("lightweighting", 0.0, unit="")
 
     def compute(self):
-        self.mass_out.mass = self.mass_in.mass + self.mass
+        self.mass_out.mass = self.mass * (1 - self.lightweighting)
